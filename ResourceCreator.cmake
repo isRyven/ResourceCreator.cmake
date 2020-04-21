@@ -29,40 +29,40 @@ if (NOT RSC_CREATE)
 	function(add_resource rscName)
 		# parse named arguments
 		set(options "")
-	    set(args VAR RELATIVE ARCHIVE)
-	    set(list_args "")
-	    cmake_parse_arguments(PARSE_ARGV 1 arg "${options}" "${args}" "${list_args}")
+		set(args VAR RELATIVE ARCHIVE)
+		set(list_args "")
+		cmake_parse_arguments(PARSE_ARGV 1 arg "${options}" "${args}" "${list_args}")
 
-	    if (NOT rscName)
-	    	message(FATAL_ERROR "add_resource: resource name must be set")
-	        return()
-	    endif()
+		if (NOT rscName)
+			message(FATAL_ERROR "add_resource: resource name must be set")
+			return()
+		endif()
 
-	   	if (NOT arg_UNPARSED_ARGUMENTS)
-	        message(FATAL_ERROR "add_resource: No resource files were passed")
-	        return()
-	   	endif()
+		if (NOT arg_UNPARSED_ARGUMENTS)
+			message(FATAL_ERROR "add_resource: No resource files were passed")
+			return()
+		endif()
 
-	    if (NOT arg_VAR)
-	        set(arg_VAR "${rscName}")
-	    endif()
+		if (NOT arg_VAR)
+			set(arg_VAR "${rscName}")
+		endif()
 
-	   	list(LENGTH arg_UNPARSED_ARGUMENTS numInputFiles)
+		list(LENGTH arg_UNPARSED_ARGUMENTS numInputFiles)
 
-	   	if (NOT arg_ARCHIVE AND numInputFiles GREATER 1)
-	   		message(FATAL_ERROR
-	   			"add_resource: In non-archival mode you can include only single file.")
-	   	endif()
+		if (NOT arg_ARCHIVE AND numInputFiles GREATER 1)
+			message(FATAL_ERROR
+				"add_resource: In non-archival mode you can include only single file.")
+		endif()
 
-	   	set(SUPPORTED_ARCHIVE_TYPES zip 7zip)
+		set(SUPPORTED_ARCHIVE_TYPES zip 7zip)
 		# set default
-	   	if (arg_ARCHIVE AND NOT arg_ARCHIVE IN_LIST SUPPORTED_ARCHIVE_TYPES)
-	        message(FATAL_ERROR 
-	        	"add_resource: Invalid archive type \"${arg_ARCHIVE}\", supported are \"${SUPPORTED_ARCHIVE_TYPES}\"")
-	        return()
-	   	endif()
+		if (arg_ARCHIVE AND NOT arg_ARCHIVE IN_LIST SUPPORTED_ARCHIVE_TYPES)
+			message(FATAL_ERROR 
+				"add_resource: Invalid archive type \"${arg_ARCHIVE}\", supported are \"${SUPPORTED_ARCHIVE_TYPES}\"")
+			return()
+		endif()
 
-	    # set export vars
+		# set export vars
 		set(RSC_ID "__rsc_${rscName}")
 		set(RSC_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${RSC_ID}.c")
 		set(RSC_OUTPUT_VAR "${arg_VAR}")
@@ -107,27 +107,27 @@ function(generate_c_file inpath outpath rcname)
 		endif()
 	endif()
 	# append hex prefixes
-    string(REGEX REPLACE "(..)(..)(..)(..)(..)" "0x\\1,0x\\2,0x\\3,0x\\4,0x\\5," hex_codes "${file_bytes}")
-    string(LENGTH "${file_bytes}" n_bytes2)
-    math(EXPR file_size "${n_bytes2} / 2")
-    math(EXPR remainder "${file_size} % 5")
-    set(cleanup_re "$")
-    set(cleanup_sub )
-    while(remainder)
-        set(cleanup_re "(..)${cleanup_re}")
-        set(cleanup_sub "0x\\${remainder},${cleanup_sub}")
-        math(EXPR remainder "${remainder} - 1")
-    endwhile()
-    if(NOT cleanup_re STREQUAL "$")
-        string(REGEX REPLACE "${cleanup_re}" "${cleanup_sub}" hex_codes "${hex_codes}")
-    endif()
-    string(CONFIGURE [[
-        const unsigned char @rcname@[] = {
-            @hex_codes@
-        };
-        const unsigned int @rcname@_length = @file_size@; 
-    ]] code)
-    file(WRITE "${outpath}" "${code}")
+	string(REGEX REPLACE "(..)(..)(..)(..)(..)" "0x\\1,0x\\2,0x\\3,0x\\4,0x\\5," hex_codes "${file_bytes}")
+	string(LENGTH "${file_bytes}" n_bytes2)
+	math(EXPR file_size "${n_bytes2} / 2")
+	math(EXPR remainder "${file_size} % 5")
+	set(cleanup_re "$")
+	set(cleanup_sub )
+	while(remainder)
+		set(cleanup_re "(..)${cleanup_re}")
+		set(cleanup_sub "0x\\${remainder},${cleanup_sub}")
+		math(EXPR remainder "${remainder} - 1")
+	endwhile()
+	if(NOT cleanup_re STREQUAL "$")
+		string(REGEX REPLACE "${cleanup_re}" "${cleanup_sub}" hex_codes "${hex_codes}")
+	endif()
+	string(CONFIGURE [[
+		const unsigned char @rcname@[] = {
+			@hex_codes@
+		};
+		const unsigned int @rcname@_length = @file_size@; 
+	]] code)
+	file(WRITE "${outpath}" "${code}")
 endfunction()
 
 function(create_c_resource)
@@ -190,10 +190,10 @@ function(create_c_resource)
 	list(LENGTH srcAbsoluteInputPaths numRelativeInputPaths)
 	math(EXPR numRelativeInputPaths "${numRelativeInputPaths} - 1")
 	foreach(i RANGE ${numRelativeInputPaths})
-	  	list(GET srcAbsoluteInputPaths ${i} srcInputFile)
-	  	list(GET dstRelativeInputPaths ${i} dstInputFile)
+		list(GET srcAbsoluteInputPaths ${i} srcInputFile)
+		list(GET dstRelativeInputPaths ${i} dstInputFile)
 		configure_file("${srcInputFile}" "${RSC_OUTPUT_DIR}/${dstInputFile}" COPYONLY)
-	  	if (RSC_DEBUG)
+		if (RSC_DEBUG)
 			message(STATUS "\"${srcInputFile}\" -> \"${RSC_OUTPUT_DIR}/${dstInputFile}\"")
 		endif()
 	endforeach()
@@ -203,8 +203,8 @@ function(create_c_resource)
 	endif()
 
 	execute_process(
-	    COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${RSC_OUTPUT_PAK} --format=${RSC_ARCHIVE} ${dstRelativeInputPaths}
-	    WORKING_DIRECTORY ${RSC_OUTPUT_DIR}
+		COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${RSC_OUTPUT_PAK} --format=${RSC_ARCHIVE} ${dstRelativeInputPaths}
+		WORKING_DIRECTORY ${RSC_OUTPUT_DIR}
 	)
 
 	if (RSC_DEBUG)
