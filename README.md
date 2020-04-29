@@ -36,7 +36,7 @@ add_resource(resourceC file1.txt)
 
 # creates executable including all created resources
 add_executable(app main.c)
-target_link_libraries($app resourceA rscB resourceC)
+target_link_libraries(app resourceA rscB resourceC)
 ```
 
 #### C Usage:
