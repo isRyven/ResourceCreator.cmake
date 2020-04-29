@@ -89,8 +89,8 @@ if (NOT RSC_CREATE)
 			DEPENDS ${arg_UNPARSED_ARGUMENTS}
 			COMMENT "Create \"${rscName}\" resource file"
 		)
-
-		set("${rscName}" "${RSC_OUTPUT}" PARENT_SCOPE)
+		add_library("${rscName}" INTERFACE)
+		target_sources("${rscName}" INTERFACE "${RSC_OUTPUT}")
 	endfunction()
 
 	return()
@@ -212,6 +212,8 @@ function(create_c_resource)
 	endif()
 
 	generate_c_file("${RSC_OUTPUT_PAK}" "${RSC_OUTPUT}" "${RSC_OUTPUT_VAR}")
+
+
 endfunction()
 
 # run create resource block 
